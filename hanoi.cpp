@@ -67,20 +67,6 @@ float retornaTopo(const struct Pilha &p) {
 	}
 }
 
-void torreDeHanoi(int n, struct Pilha &origem, struct Pilha &destino, struct Pilha &auxiliar) { /*3 referências novas para 3 torres*/
-    if (n > 0) {
-        // move n-1 discos de origme para auxiliar usando 'destino' como auxiliar
-        torreDeHanoi(n - 1, origem, auxiliar, destino);
-
-        // move o enésimo da origem para o destino
-        float disco = removeTopo(origem);
-        empilha(destino, disco);
-        cout << "Mover disco " << disco << " de " << origem.nome << " para " << destino.nome << endl;
-
-        // Move n-1 discos da auxiliar para a destino usando a origem como auxiliar
-        torreDeHanoi(n - 1, auxiliar, destino, origem);
-    }
-}
 
 void exibirEstadoDasTorres(const struct Pilha &origem, const struct Pilha &destino, const struct Pilha &auxiliar) {
         cout << "Estado das Torres:\n";
@@ -104,99 +90,125 @@ void exibirEstadoDasTorres(const struct Pilha &origem, const struct Pilha &desti
         cout << endl;
 }
 
+void torreDeHanoi(int n, struct Pilha &origem, struct Pilha &destino, struct Pilha &auxiliar) { /*3 referências novas para 3 torres*/
+    if (n > 0) {
+        // move n-1 discos de origme para auxiliar usando 'destino' como auxiliar
+        torreDeHanoi(n - 1, origem, auxiliar, destino);
+
+        // move o enésimo da origem para o destino
+        float disco = removeTopo(origem);
+        empilha(destino, disco);
+        cout << "Mover disco " << disco << " de " << origem.nome << " para " << destino.nome << endl;
+
+        exibirEstadoDasTorres(origem, destino, auxiliar);
+
+        // Move n-1 discos da auxiliar para a destino usando a origem como auxiliar
+        torreDeHanoi(n - 1, auxiliar, destino, origem);
+    }
+}
+
 /*código principal de interação com usuários*/
 
-int main(void)
-{
-	struct Pilha minhaPilha;
-    struct Pilha origem, destino, auxiliar;
+int main(void) {
+    int option;
 
-    origem.nome = "Origem";
-    destino.nome = "Destino";
-    auxiliar.nome = "Auxiliar";
+    while (true) {
+        cout << "Escolha uma opcao:" << endl;
+        cout << "1- Trabalhar com Pilhas" << endl;
+        cout << "2- Resolver a Torre de Hanoi" << endl;
+        cout << "3- Sair" << endl;
+        cout << "Digite sua escolha: ";
+        cin >> option;
 
-	int capacidade, option, numDiscos;   /*variáveis inteiras para função principal*/
-	float valor;      /*variável ponto flutuante, pilha pode armazenar ponto flutuante*/
+        if (option == 1) {
+            Pilha minhaPilha;
+            int capacidade;
+            float valor;
 
-	cout << "\nCapacidade da pilha? ";
-	cin >> capacidade;
+            cout << "Capacidade da pilha? ";
+            cin >> capacidade;
 
-	criarPilha(minhaPilha, capacidade);
+            criarPilha(minhaPilha, capacidade);
 
-	while (true) { /*loop infinito que permite escolher a operação*/
+            while (true) {
+                cout << "1- Empilhar (Push)" << endl;
+                cout << "2- Desempilhar/Remover (Pop)" << endl;
+                cout << "3- Mostrar topo" << endl;
+                cout << "4- Exibir pilha" << endl;
+                cout << "5- Voltar" << endl;
+                cout << "Opcao? ";
+                cin >> option;
 
-		cout << "\n1- Empilhar (Push)\n"
-		     << "2- Desempilhar/Remover (Pop)\n"
-		     << "3- Mostrar topo\n"
-		     << "4- Resolver a torre de hanoi\n"
-             << "5- Finalizar\n"
-		     << "\nDigite a opcao: \n";
+                switch (option) {
+                    case 1: // Push
+                        if (estaCheia(minhaPilha)) {
+                            cout << "PILHA CHEIA!" << endl;
+                        } else {
+                            cout << "VALOR? ";
+                            cin >> valor;
+                            empilha(minhaPilha, valor);
+                        }
+                        break;
 
-		cin >> option; /*operação escolhida é armazenada na variável*/
+                    case 2: // Pop
+                        if (checaVazia(minhaPilha)) {
+                            cout << "PILHA VAZIA!" << endl;
+                        } else {
+                            valor = removeTopo(minhaPilha);
+                            cout << valor << " DESEMPILHADO!" << endl;
+                        }
+                        break;
 
-		switch (option) { /*switch permite dividir condições em casos e orientar ao que fazer de acordo com o valor selecionado pelo user.*/
+                    case 3: // Mostrar topo
+                        if (checaVazia(minhaPilha)) {
+                            cout << "PILHA VAZIA!" << endl;
+                        } else {
+                            valor = retornaTopo(minhaPilha);
+                            cout << "TOPO: " << valor << endl;
+                        }
+                        break;
 
-			case 1 : /*push*/
+                    case 4: // Exibir pilha
+                        exibirEstadoDasTorres(minhaPilha, minhaPilha, minhaPilha); // Exibição da pilha como se fosse a Torre de Hanoi
+                        break;
 
-				if (estaCheia(minhaPilha)) {
-					cout << "\nPilha esta cheia. \n";
-				} else {
-					cout << "\nValor? \n";
-					cin >> valor;
-					empilha(minhaPilha, valor);
-				}
+                    case 5: // Voltar
+                        break;
 
-				break;
-
-			case 2 : /*pop*/
-
-				if(checaVazia(minhaPilha)) {
-					cout << "\nPilha vazia. \n";
-				} else {
-					valor = removeTopo(minhaPilha);
-					cout << "\n" << valor << " Desempilhado.";
-				}
-
-				break;
-
-			case 3 : /*mostrar topo*/
-
-				if (checaVazia(minhaPilha)) {
-					cout << "\nPilha vazia. \n";
-				} else {
-					valor = retornaTopo(minhaPilha);
-					cout << "\nTopo: " << valor << "\n";
-				}
-
-				break;
-
-            case 4:
-                cout << "\nInforme o numero de discos para a Torre de Hanoi: ";
-                cin >> numDiscos;
-
-                origem.vetorElementos.clear();
-                auxiliar.vetorElementos.clear();
-                destino.vetorElementos.clear();
-
-                for (int i = numDiscos; i >= 1; i--) {
-                    empilha(origem, i);
+                    default:
+                        cout << "Opcao invalida!" << endl;
                 }
 
-                cout << "\nEstado inicial das torres: \n";
-                exibirEstadoDasTorres(origem, destino, auxiliar);
+                if (option == 5) {
+                    break;
+                }
+            }
+        } else if (option == 2) {
+            int numDiscos;
+            Pilha origem, destino, auxiliar;
 
-                cout << "\nResolvendo a Torre de Hanoi...\n";
-                torreDeHanoi(numDiscos, origem, destino, auxiliar);
-                cout << "\nTorre de Hanoi resolvida!\n";
+            cout << "Informe o numero de discos para a Torre de Hanoi: ";
+            cin >> numDiscos;
 
-                break;
+            criarPilha(origem, numDiscos);
+            criarPilha(destino, numDiscos);
+            criarPilha(auxiliar, numDiscos);
 
-            case 5:
-                exit(0);
+            for (int i = numDiscos; i >= 1; i--) {
+                empilha(origem, i);
+            }
 
-	    default:
-		cout << "\nOpcao invalida. \n";
-		}
-	}
-	return 0;
+            cout << "Resolvendo a Torre de Hanoi..." << endl;
+            torreDeHanoi(numDiscos, origem, destino, auxiliar);
+            cout << "Torre de Hanoi resolvida!" << endl;
+
+        } else if (option == 3) {
+            cout << "Saindo do programa. Ate logo!" << endl;
+            break;
+        } else {
+            cout << "Opcao invalida. Tente novamente." << endl;
+        }
+    }
+
+    return 0;
 }
