@@ -1,209 +1,43 @@
 #include <iostream>
-#include <vector>
+#include <stack>
 
-using namespace std; /*para não escrever o parâmetro std::"..." todas as vezes antes de usar algo*/
+using namespace std;
 
-/*funções e estrutura Pilha*/
-/*&p é uma referência da estrutura denominada "Pilha"*/
-
-struct Pilha {                      /*Estrutura chamada pilha que representa a estrutura da pilha, que possui 3 membros*/
-
-	int topo;         				/*posição do elemento do topo*/
-	int capacidadeMax;				/*capacidade máxima da pilha*/
-	vector <float> vetorElementos;			/*elemento 'vetor' que armazena os elementos da pilha como float*/
-    string nome;                    /*operar com classes no código de hanoi*/
-};
-
-void criarPilha (struct Pilha &p, int c, string nome){  	/*função que cria pilha, recebe uma referência para uma estrutura Pilha
-											e a capacidade "int c" como argumentos*/
-	p.topo = -1;
-	p.capacidadeMax = c;              /*define a capacidade da pilha*/
-	p.vetorElementos.reserve(p.capacidadeMax); /*define a capacidade do vetor*/
-    p.nome = nome;
-}
-
-bool checaVazia(const struct Pilha &p) {
-
-	return p.topo == -1; 		/*checa se a pilha é vazia, caso o topo seja -1
-								a pilha é vazia.*/
-}
-
-bool estaCheia(const struct Pilha &p) {
-
-	return p.topo == p.capacidadeMax - 1; 		/*checa se a pilha está cheia, caso o topo seja igual a capacidadeMax -1
-												a pilha está lotada*/
-
-}
-
-void empilha(struct Pilha &p, float v) {
-
-    if (!estaCheia(p)) {        /*Checa se a pilha está cheia usando a função estaCheia*/
-		p.topo++;
-		p.vetorElementos.push_back(v);
-	} else {
-		cout << "Pilha esta cheia!\n"; /*mensagem de erro, caso esteja cheia.*/
-	}
-
-}
-
-float removeTopo(struct Pilha &p) { /*função que remove elementos da pilha, sempre o do topo.*/
-	if (!checaVazia(p)) {
-		float aux = p.vetorElementos[p.topo]; /*se não estiver vazia, o topo é removido*/
-		p.topo--;
-		return aux;
-	} else {
-		cout << "\nPilha esta vazia\n";
-		return 0.0;
-	}
-}
-
-
-float retornaTopo(const struct Pilha &p) {
-	if(!checaVazia(p)) {
-		return p.vetorElementos[p.topo]; /*topo da pilha é retornado*/
-	} else {
-		cout << "\nPilha esta vazia\n";
-		return 0.0;
-	}
-}
-
-
-void exibirEstadoDasTorres(const struct Pilha &origem, const struct Pilha &destino, const struct Pilha &auxiliar) {
-        cout << "Estado das Torres:\n";
-
-        cout << origem.nome << ": ";
-        for (int i = origem.topo; i >= 0; i--) {
-            cout << origem.vetorElementos[i] << " ";
-        }
-        cout << endl;
-
-        cout << destino.nome << ": ";
-        for (int i = destino.topo; i >= 0; i--) {
-            cout << destino.vetorElementos[i] << " ";
-        }
-        cout << endl;
-
-        cout << auxiliar.nome << ": ";
-        for (int i = auxiliar.topo; i >= 0; i--) {
-            cout << auxiliar.vetorElementos[i] << " ";
-        }
-        cout << endl;
-}
-
-void torreDeHanoi(int n, struct Pilha &origem, struct Pilha &destino, struct Pilha &auxiliar) { /*3 referências novas para 3 torres*/
-    if (n > 0) {
-        // move n-1 discos de origme para auxiliar usando 'destino' como auxiliar
-        torreDeHanoi(n - 1, origem, auxiliar, destino);
-
-        // move o enésimo da origem para o destino
-        float disco = removeTopo(origem);
-        empilha(destino, disco);
-        cout << "Mover disco " << disco << " de " << origem.nome << " para " << destino.nome << endl;
-
-        exibirEstadoDasTorres(origem, destino, auxiliar);
-
-        // Move n-1 discos da auxiliar para a destino usando a origem como auxiliar
-        torreDeHanoi(n - 1, auxiliar, destino, origem);
+/*função que opera a torre de hanói com 3 referências de pilhas e 3 referências de string para poder nomear corretamente no terminal*/
+void torreDeHanoi(int numDiscos, stack<int> &origem, stack<int> &auxiliar, stack<int> &destino,
+                  const string &origemNome, const string &auxiliarNome, const string &destinoNome)
+{
+    if (numDiscos == 1) {
+        int disco = origem.top();
+        origem.pop();
+        destino.push(disco);
+        cout << "Move disco " << disco << " da " << origemNome << " para " << destinoNome << endl;
+        return;
     }
-}
 
-/*código principal de interação com usuários*/
+    torreDeHanoi(numDiscos - 1, origem, destino, auxiliar, origemNome, destinoNome, auxiliarNome);
+
+    int disco = origem.top();
+    origem.pop();
+    destino.push(disco);
+    cout << "Move disco " << disco << " da " << origemNome << " para " << destinoNome << endl;
+
+    torreDeHanoi(numDiscos - 1, auxiliar, origem, destino, auxiliarNome, origemNome, destinoNome);
+}
 
 int main(void) {
-    int option;
+    int numDiscos;
 
-    while (true) {
-        cout << "\nEscolha uma opcao: " << endl
-             << "1- Trabalhar com Pilhas" << endl
-             << "2- Resolver a Torre de Hanoi" << endl
-             << "3- Sair" << endl
-             << "\nDigite sua escolha: ";
-        cin >> option;
+    cout << "Informe o numero de discos: ";
+    cin >> numDiscos;
 
-        if (option == 1) {
-            Pilha minhaPilha;
-            int capacidade;
-            float valor;
+    stack<int> origem, auxiliar, destino;
 
-            cout << "\nCapacidade da pilha? ";
-            cin >> capacidade;
-
-            criarPilha(minhaPilha, capacidade, "Pilha");
-
-            while (true) {
-                cout << "\n1- Empilhar (Push)" << endl
-                 << "2- Desempilhar/Remover (Pop)" << endl
-                 << "3- Mostrar topo" << endl
-                 << "4- Voltar" << endl
-                 << "Opcao: ";
-                cin >> option;
-
-                switch (option) {
-                    case 1: // Push
-                        if (estaCheia(minhaPilha)) {
-                            cout << "Pilha esta cheia." << endl;
-                        } else {
-                            cout << "Valor: ";
-                            cin >> valor;
-                            empilha(minhaPilha, valor);
-                        }
-                        break;
-
-                    case 2: // Pop
-                        if (checaVazia(minhaPilha)) {
-                            cout << "Pilha esta vazia.\n" << endl;
-                        } else {
-                            valor = removeTopo(minhaPilha);
-                            cout << valor << " desempilhado\n" << endl;
-                        }
-                        break;
-
-                    case 3: // Mostrar topo
-                        if (checaVazia(minhaPilha)) {
-                            cout << "Pilha esta vazia\n" << endl;
-                        } else {
-                            valor = retornaTopo(minhaPilha);
-                            cout << "Topo: " << valor << endl;
-                        }
-                        break;
-
-                    case 4: // Voltar
-                        break;
-
-                    default:
-                        cout << "Opcao invalida!" << endl;
-                }
-
-                if (option == 4) {
-                    break;
-                }
-            }
-        } else if (option == 2) {
-            int numDiscos;
-
-            cout << "\nInforme o numero de discos para a Torre de Hanoi: ";
-            cin >> numDiscos;
-
-            Pilha origem, destino, auxiliar;
-            criarPilha(origem, numDiscos, "Origem");
-            criarPilha(destino, numDiscos, "Destino");
-            criarPilha(auxiliar, numDiscos, "Auxiliar");
-
-            for (int i = numDiscos; i >= 1; i--) {
-                origem.vetorElementos[++origem.topo] = i;
-            }
-
-            cout << "Resolvendo a Torre de Hanoi..." << endl;
-            torreDeHanoi(numDiscos, origem, destino, auxiliar);
-            cout << "Torre de Hanoi resolvida!" << endl;
-
-        } else if (option == 3) {
-            cout << "Programa encerrado." << endl;
-            break;
-        } else {
-            cout << "Opcao invalida." << endl;
-        }
+    for (int i = numDiscos; i >= 1; i--) {
+        origem.push(i);
     }
+
+    torreDeHanoi(numDiscos, origem, auxiliar, destino, "Origem", "Auxiliar", "Destino");
 
     return 0;
 }
