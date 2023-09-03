@@ -2,11 +2,6 @@
 #include <stack>
 #include <vector>
 
-/*inclusão de bibliotecas necessárias*/
-
-#include <iostream>
-#include <vector>
-
 using namespace std; /*para não escrever o parâmetro std::"..." todas as vezes antes de usar algo*/
 
 /*funções e estrutura Pilha*/
@@ -87,24 +82,26 @@ void torreDeHanoi(int n, struct Pilha &origem, struct Pilha &destino, struct Pil
     }
 }
 
-void exibirTorres(const struct Pilha &origem, const struct Pilha &destino, const struct Pilha &auxiliar) {
-    cout << "Origem: ";
-    for (int i = origem.topo; i >= 0; i--) {
-        cout << origem.vetorElementos[i] << " ";
-    }
-    cout << endl;
+void exibirEstadoDasTorres(const struct Pilha &origem, const struct Pilha &destino, const struct Pilha &auxiliar) {
+        cout << "Estado das Torres:\n";
 
-    cout << "Destino: ";
-    for (int i = destino.topo; i >= 0; i--) {
-        cout << destino.vetorElementos[i] << " ";
-    }
-    cout << endl;
+        cout << origem.nome << ": ";
+        for (int i = origem.topo; i >= 0; i--) {
+            cout << origem.vetorElementos[i] << " ";
+        }
+        cout << endl;
 
-    cout << "Auxiliar: ";
-    for (int i = auxiliar.topo; i >= 0; i--) {
-        cout << auxiliar.vetorElementos[i] << " ";
-    }
-    cout << endl;
+        cout << destino.nome << ": ";
+        for (int i = destino.topo; i >= 0; i--) {
+            cout << destino.vetorElementos[i] << " ";
+        }
+        cout << endl;
+
+        cout << auxiliar.nome << ": ";
+        for (int i = auxiliar.topo; i >= 0; i--) {
+            cout << auxiliar.vetorElementos[i] << " ";
+        }
+        cout << endl;
 }
 
 /*código principal de interação com usuários*/
@@ -113,6 +110,11 @@ int main(void)
 {
 	struct Pilha minhaPilha;
     struct Pilha origem, destino, auxiliar;
+
+    origem.nome = "Origem";
+    destino.nome = "Destino";
+    auxiliar.nome = "Auxiliar";
+
 	int capacidade, option, numDiscos;   /*variáveis inteiras para função principal*/
 	float valor;      /*variável ponto flutuante, pilha pode armazenar ponto flutuante*/
 
@@ -129,6 +131,7 @@ int main(void)
 		     << "4- Resolver a torre de hanoi\n"
              << "5- Finalizar\n"
 		     << "\nDigite a opcao: \n";
+
 		cin >> option; /*operação escolhida é armazenada na variável*/
 
 		switch (option) { /*switch permite dividir condições em casos e orientar ao que fazer de acordo com o valor selecionado pelo user.*/
@@ -167,32 +170,32 @@ int main(void)
 
 				break;
 
-      case 4:
-          cout << "\nInforme o numero de discos para a Torre de Hanoi: ";
-          cin >> numDiscos;
+            case 4:
+                cout << "\nInforme o numero de discos para a Torre de Hanoi: ";
+                cin >> numDiscos;
 
-          origem.nome = "Origem";
-          destino.nome = "Destino";
-          auxiliar.nome = "Auxiliar";
+                origem.vetorElementos.clear();
+                auxiliar.vetorElementos.clear();
+                destino.vetorElementos.clear();
 
-          for (int i = numDiscos; i >= 1; i--) {
-             empilha(origem, i);
-          }
+                for (int i = numDiscos; i >= 1; i--) {
+                    empilha(origem, i);
+                }
 
-          cout << "\nEstado inicial das torres: \n";
-          exibirTorres(origem, auxiliar, destino);
+                cout << "\nEstado inicial das torres: \n";
+                exibirEstadoDasTorres(origem, destino, auxiliar);
 
-          cout << "\nResolvendo a Torre de Hanoi...\n";
-          torreDeHanoi(numDiscos, origem, destino, auxiliar);
-          cout << "\nTorre de Hanoi resolvida!\n";
+                cout << "\nResolvendo a Torre de Hanoi...\n";
+                torreDeHanoi(numDiscos, origem, destino, auxiliar);
+                cout << "\nTorre de Hanoi resolvida!\n";
 
-          break;
+                break;
 
-          case 5:
-              exit(0);
+            case 5:
+                exit(0);
 
-			default:
-				  cout << "\nOpcao invalida. \n";
+	    default:
+		cout << "\nOpcao invalida. \n";
 		}
 	}
 	return 0;
